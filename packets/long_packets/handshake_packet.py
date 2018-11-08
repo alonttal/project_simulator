@@ -1,9 +1,13 @@
+from ip_header import IpHeader
 from packets.long_packets.long_packet import LongPacket
 from packets.long_packets.long_packet_types import LongPacketType
+from udp_header import UdpHeader
 
 
 class HandshakePacket(LongPacket):
     def __init__(self,
+                 ip_header: IpHeader,
+                 udp_header: UdpHeader,
                  version,
                  dcil,
                  scil,
@@ -12,7 +16,9 @@ class HandshakePacket(LongPacket):
                  length,
                  packet_number,
                  payload):
-        super().__init__(LongPacketType.HANDSHAKE_PACKET,
+        super().__init__(ip_header,
+                         udp_header,
+                         LongPacketType.HANDSHAKE_PACKET,
                          version,
                          dcil,
                          scil,
