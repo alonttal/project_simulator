@@ -18,8 +18,6 @@ class LongPacket(QuicPacket):
                  source_connection_id):
         super().__init__(ip_header,
                          udp_header,
-                         ip_header,
-                         udp_header,
                          LongPacket.HEADER_FORM,
                          packet_type,
                          destination_connection_id)

@@ -1,16 +1,37 @@
 from scapy.all import *
 
 from connections_tracker import ConnectionsTracker
+from global_connections_manager import GlobalConnectionsManager
+from ip_header import IpHeader
 from packets.short_packets.short_packet import ShortPacket
+from tcp_packet import TcpPacket, TcpFlag
 from tcp_parser import TcpParser
 
-short_p = ShortPacket(123, 1, "encrypted payload")
-print(short_p.header_form)
-print(short_p.destination_connection_id)
-print(short_p.packet_number)
-print(short_p.payload)
+# short_p = ShortPacket(123, 1, "encrypted payload")
+# print(short_p.header_form)
+# print(short_p.destination_connection_id)
+# print(short_p.packet_number)
+# print(short_p.payload)
 
 #  long_p = LongPacket(1)
+
+gcm = GlobalConnectionsManager()
+ip_header1 = IpHeader(20, 5, "132.68.40.13", "216.58.206.3")
+ip_header2 = IpHeader(20, 5, "132.68.40.13", "216.255.255.455")
+ip_header3 = IpHeader(20, 5, "132.14.14.14", "216.255.255.455")
+s_port = 10
+d_port = 443
+p1 = TcpPacket(ip_header1, s_port, d_port, 0, 0, 20, [TcpFlag.SYN], 256, 123, 0, "")
+# p2 = TcpPacket(ip_header1, s_port, d_port, 0, 0, 20, [TcpFlag.ACK], 256, 123, 0, "")
+# p3 = TcpPacket(ip_header1, s_port, d_port, 0, 0, 20, [], 256, 123, 0, "")
+p4 = TcpPacket(ip_header1, s_port, d_port, 0, 0, 20, [TcpFlag.FIN], 256, 123, 0, "")
+# p5 = TcpPacket(ip_header2, s_port, d_port, 0, 0, 20, [TcpFlag.SYN], 256, 123, 0, "")
+p6 = TcpPacket(ip_header3, s_port, d_port, 0, 0, 20, [TcpFlag.SYN], 256, 123, 0, "")
+p7 = TcpPacket(ip_header1, s_port, d_port, 0, 0, 20, [], 256, 123, 0, "")
+p_l = [p1, p6, p4, p7]
+for pa in p_l:
+    gcm.get_tcp_packet(pa)
+
 
 packets = rdpcap('captures/example.pcap')
 parser = TcpParser()
