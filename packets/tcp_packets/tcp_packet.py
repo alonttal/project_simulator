@@ -1,5 +1,5 @@
 from enum import Enum
-from ip_header import IpHeader
+from headers.ip_header import IpHeader
 
 
 class TcpFlag(Enum):

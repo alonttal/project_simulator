@@ -1,5 +1,5 @@
-from udp_header import UdpHeader
-from ip_header import IpHeader
+from headers.udp_header import UdpHeader
+from headers.ip_header import IpHeader
 
 
 class QuicPacket:

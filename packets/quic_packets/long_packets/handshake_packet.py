@@ -1,10 +1,10 @@
-from ip_header import IpHeader
-from packets.long_packets.long_packet import LongPacket
-from packets.long_packets.long_packet_types import LongPacketType
-from udp_header import UdpHeader
+from headers.ip_header import IpHeader
+from packets.quic_packets.long_packets import LongPacket
+from packets.quic_packets.long_packets import LongPacketType
+from headers.udp_header import UdpHeader
 
 
-class InitialPacket(LongPacket):
+class HandshakePacket(LongPacket):
     def __init__(self,
                  ip_header: IpHeader,
                  udp_header: UdpHeader,
@@ -13,21 +13,17 @@ class InitialPacket(LongPacket):
                  scil,
                  destination_connection_id,
                  source_connection_id,
-                 token_length,
-                 token,
                  length,
                  packet_number,
                  payload):
         super().__init__(ip_header,
                          udp_header,
-                         LongPacketType.INITIAL_PACKET,
+                         LongPacketType.HANDSHAKE_PACKET,
                          version,
                          dcil,
                          scil,
                          destination_connection_id,
                          source_connection_id)
-        self.token_length = token_length
-        self.token = token
         self.length = length
         self.packet_number = packet_number
         self.payload = payload

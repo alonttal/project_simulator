@@ -2,9 +2,8 @@ from scapy.all import *
 
 from connections_tracker import ConnectionsTracker
 from global_connections_manager import GlobalConnectionsManager
-from ip_header import IpHeader
-from packets.short_packets.short_packet import ShortPacket
-from tcp_packet import TcpPacket, TcpFlag
+from headers.ip_header import IpHeader
+from packets.tcp_packets.tcp_packet import TcpPacket, TcpFlag
 from tcp_parser import TcpParser
 
 # short_p = ShortPacket(123, 1, "encrypted payload")

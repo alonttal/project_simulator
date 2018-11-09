@@ -1,8 +1,8 @@
-from ip_header import IpHeader
-from packets.quic_packet import QuicPacket
+from headers.ip_header import IpHeader
+from packets.quic_packets.quic_packet import QuicPacket
 
 # Version Negotiation Packet does not count as a Long Packet
-from udp_header import UdpHeader
+from headers.udp_header import UdpHeader
 
 
 class VersionNegotiationPacket(QuicPacket):

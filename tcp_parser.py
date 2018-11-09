@@ -1,5 +1,5 @@
-from tcp_packet import TcpFlag, TcpPacket
-from ip_header import IpHeader
+from packets.tcp_packets.tcp_packet import TcpFlag, TcpPacket
+from headers.ip_header import IpHeader
 
 
 class TcpParser:

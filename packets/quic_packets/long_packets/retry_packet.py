@@ -1,7 +1,7 @@
-from ip_header import IpHeader
-from packets.long_packets.long_packet import LongPacket
-from packets.long_packets.long_packet_types import LongPacketType
-from udp_header import UdpHeader
+from headers.ip_header import IpHeader
+from packets.quic_packets.long_packets import LongPacket
+from packets.quic_packets.long_packets import LongPacketType
+from headers.udp_header import UdpHeader
 
 
 class RetryPacket(LongPacket):

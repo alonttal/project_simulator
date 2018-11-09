@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from tcp_packet import TcpPacket, TcpFlag
+from packets.tcp_packets.tcp_packet import TcpPacket, TcpFlag
 from tcp_to_quic_packet_converter import TcpToQuicPacketConverter
 from utils import generate_random_string
 

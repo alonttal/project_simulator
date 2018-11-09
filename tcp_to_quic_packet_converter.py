@@ -1,12 +1,9 @@
-import string
-from random import random
-
-from packets.long_packets.handshake_packet import HandshakePacket
-from packets.long_packets.initial_packet import InitialPacket
-from packets.other_packets.version_negotiation_packet import VersionNegotiationPacket
-from packets.short_packets.short_packet import ShortPacket
-from tcp_packet import TcpPacket
-from udp_header import UdpHeader
+from packets.quic_packets.long_packets.handshake_packet import HandshakePacket
+from packets.quic_packets.long_packets.initial_packet import InitialPacket
+from packets.quic_packets.other_packets.version_negotiation_packet import VersionNegotiationPacket
+from packets.quic_packets.short_packets import ShortPacket
+from packets.tcp_packets.tcp_packet import TcpPacket
+from headers.udp_header import UdpHeader
 from utils import generate_random_string
 
 

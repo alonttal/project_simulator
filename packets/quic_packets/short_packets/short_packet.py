@@ -1,6 +1,6 @@
-from ip_header import IpHeader
-from packets.quic_packet import QuicPacket
-from udp_header import UdpHeader
+from headers.ip_header import IpHeader
+from packets.quic_packets.quic_packet import QuicPacket
+from headers.udp_header import UdpHeader
 
 
 class ShortPacket(QuicPacket):
