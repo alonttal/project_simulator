@@ -18,6 +18,9 @@ class GlobalConnectionsMapEntry:
         self.quic_version = quic_version
         self.current_source_ip = current_source_ip
 
+    def get_number_of_connections(self):
+        pass
+
 
 class GlobalConnectionsManager:
     DEFAULT_SOURCE_CONNECTION_ID_LENGTH = 64
@@ -28,7 +31,7 @@ class GlobalConnectionsManager:
         self.__global_connections_map: Dict[str, GlobalConnectionsMapEntry] = {}
         self.__closed_connections_map: List[(str, GlobalConnectionsMapEntry)] = []
 
-    def get_tcp_packet(self, tcp_packet: TcpPacket):
+    def get_quic_packet(self, tcp_packet: TcpPacket):
         print("new packet received")
         # TODO: need to randomly generate a new connection id
         # TODO: allow injection of probability functions
@@ -68,3 +71,6 @@ class GlobalConnectionsManager:
                           str(len(self.__closed_connections_map)))
                     self.__global_connections_map.pop(source_ip)
         return packet
+
+    def get_number_of_connections(self):
+        return len(self.__global_connections_map)
