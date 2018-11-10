@@ -1,7 +1,7 @@
 from packets.quic_packets.long_packets.handshake_packet import HandshakePacket
 from packets.quic_packets.long_packets.initial_packet import InitialPacket
 from packets.quic_packets.other_packets.version_negotiation_packet import VersionNegotiationPacket
-from packets.quic_packets.short_packets import ShortPacket
+from packets.quic_packets.short_packets.short_packet import ShortPacket
 from packets.tcp_packets.tcp_packet import TcpPacket
 from headers.udp_header import UdpHeader
 from utils import generate_random_string
@@ -31,7 +31,7 @@ class TcpToQuicPacketConverter:
                                   destination_connection_id,
                                   source_connection_id):
         # token value must be set to zero if sent from serve
-        token = generate_random_string(self.DEFAULT_TOKEN_LENGTH)
+        token = generate_random_string(TcpToQuicPacketConverter.DEFAULT_TOKEN_LENGTH)
         udp_header = self.__build_udp_header(tcp_packet)
         length = 0  # TODO: change to real length
         packet_number = "encrypted"
