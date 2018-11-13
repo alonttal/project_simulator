@@ -1,12 +1,10 @@
 from scapy.all import *
 from scapy.layers.inet import TCP, IP
 
-from connections_tracker import ConnectionsTracker
 from exporter import CsvExporter
 from global_connections_manager import GlobalConnectionsManager
-from headers.ip_header import IpHeader
-from packets.tcp_packets.tcp_packet import TcpPacket, TcpFlag
-from simple_packets_tacker import SimplePacketsTracker
+from packets_trackers.iptd_packets_tracker import IptdPacketsTracker
+from packets_trackers.ping_pong_packets_tacker import PingPongPacketsTracker
 from tcp_parser import TcpParser
 
 # short_p = ShortPacket(123, 1, "encrypted payload")
@@ -46,8 +44,8 @@ packet_sampling_times = []
 real_number_of_connections = []
 estimated_number_of_connections = []
 global_connections_manager = GlobalConnectionsManager()
-attacker = SimplePacketsTracker()
-pcap_reader = PcapReader('captures/half_caida.pcap')
+attacker = IptdPacketsTracker()
+pcap_reader = PcapReader('captures/example2.pcap')
 for raw_packet in pcap_reader:
     if raw_packet.haslayer(TCP) and raw_packet.haslayer(IP):  # TODO: maybe we need to also support IPv6
         tcp_packet = TcpParser().parse(raw_packet)

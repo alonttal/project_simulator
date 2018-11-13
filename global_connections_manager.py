@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from packets.tcp_packets.tcp_packet import TcpPacket, TcpFlag
-from tcp_to_quic_packet_converter import TcpToQuicPacketConverter
+from converters.tcp_to_quic_packet_converter import TcpToQuicPacketConverter
 from utils import generate_random_string
 
 
@@ -41,7 +41,7 @@ class GlobalConnectionsManager:
         global_connection_map_entry = self.__global_connections_map.get(source_ip)
         if global_connection_map_entry is None:  # not in map
             print("new connection detected")
-            if TcpFlag.SYN in tcp_packet.flags:
+            if TcpFlag.SYN in tcp_packet.flags and TcpFlag.ACK not in tcp_packet.flags:
                 print("it is a SYN packet. adding to map")
                 quic_version = GlobalConnectionsManager.DEFAULT_QUIC_VERSION
                 source_connection_id = generate_random_string(
