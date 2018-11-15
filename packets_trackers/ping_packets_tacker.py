@@ -3,6 +3,7 @@ from typing import Dict
 from packets.quic_packets.long_packets.long_packet_types import LongPacketType
 from packets.quic_packets.quic_packet import QuicPacket
 from packets_trackers.packets_tacker import PacketsTracker
+from utils import ConnectionId
 
 
 class ConnectionsMapEntry:
@@ -25,8 +26,8 @@ class PingPongPacketsTracker(PacketsTracker):
     MAX_IDLE_TIME = 16
 
     def __init__(self):
-        self.__active_connections_map: Dict[str, ConnectionsMapEntry] = {}
-        self.__closed_connections_map: Dict[(str, ConnectionsMapEntry)] = {}
+        self.__active_connections_map: Dict[ConnectionId, ConnectionsMapEntry] = {}
+        self.__closed_connections_map: Dict[(ConnectionId, ConnectionsMapEntry)] = {}
 
     def find_and_remove_dead_connections(self, current_time):
         closed_connections = []

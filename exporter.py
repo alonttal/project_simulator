@@ -4,15 +4,25 @@ import csv
 class Exporter:
     EXPORTS_DIRECTORY = 'exports/'
 
+    def __init__(self, file_name):
+        self.file_name = Exporter.EXPORTS_DIRECTORY + file_name
+
 
 class CsvExporter(Exporter):
-    def export(self,
-               file_name,
-               times,
-               real_number_of_connections,
-               estimated_number_of_connections):
-        with open(Exporter.EXPORTS_DIRECTORY + file_name, 'w', newline='') as csvfile:
+
+    def __init__(self, file_name):
+        super().__init__(file_name)
+
+    def write(self,
+               mode,
+               *lists):
+        with open(self.file_name, mode, newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(['times', 'real number of connections', 'estimated number of connections'])
-            for i in range(0, len(times)):
-                writer.writerow([times[i], real_number_of_connections[i], estimated_number_of_connections[i]])
+            for val in zip(*lists):
+                writer.writerow(val)
+
+    def clear_file(self):
+        open(self.file_name, 'w').close()
+
+    def write_headers(self, *headers):
+        self.export('a', *([h] for h in headers))

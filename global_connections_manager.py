@@ -2,7 +2,7 @@ from typing import Dict, List
 
 from packets.tcp_packets.tcp_packet import TcpPacket, TcpFlag
 from converters.tcp_to_quic_packet_converter import TcpToQuicPacketConverter
-from utils import generate_random_string
+from utils import generate_random_string, SourceIp
 
 
 class GlobalConnectionsMapEntry:
@@ -28,11 +28,11 @@ class GlobalConnectionsManager:
     DEFAULT_QUIC_VERSION = "1"
 
     def __init__(self):
-        self.__global_connections_map: Dict[str, GlobalConnectionsMapEntry] = {}
-        self.__closed_connections_map: List[(str, GlobalConnectionsMapEntry)] = []
+        self.__global_connections_map: Dict[SourceIp, GlobalConnectionsMapEntry] = {}
+        self.__closed_connections_map: List[(SourceIp, GlobalConnectionsMapEntry)] = []
 
     def get_quic_packet(self, tcp_packet: TcpPacket):
-        print("new packet received")
+        #print("new packet received")
         # TODO: need to randomly generate a new connection id
         # TODO: allow injection of probability functions
         packet = None
@@ -40,9 +40,9 @@ class GlobalConnectionsManager:
         destination_ip = tcp_packet.ip_header.destination_ip
         global_connection_map_entry = self.__global_connections_map.get(source_ip)
         if global_connection_map_entry is None:  # not in map
-            print("new connection detected")
+            #print("new connection detected")
             if TcpFlag.SYN in tcp_packet.flags and TcpFlag.ACK not in tcp_packet.flags:
-                print("it is a SYN packet. adding to map")
+                #print("it is a SYN packet. adding to map")
                 quic_version = GlobalConnectionsManager.DEFAULT_QUIC_VERSION
                 source_connection_id = generate_random_string(
                     GlobalConnectionsManager.DEFAULT_SOURCE_CONNECTION_ID_LENGTH)
@@ -59,16 +59,16 @@ class GlobalConnectionsManager:
                                                                               destination_connection_id,
                                                                               source_connection_id)
         else:  # in map
-            print("the source ip is known")
+            #print("the source ip is known")
             if global_connection_map_entry.destination_ip == destination_ip:  # track only a single connection
-                print("connection is known")
+                #print("connection is known")
                 packet = TcpToQuicPacketConverter() \
                     .convert_to_short_packet(tcp_packet, global_connection_map_entry.destination_connection_id)
                 if TcpFlag.FIN in tcp_packet.flags:
-                    print("it is a FIN packet. removing from map")
+                    #print("it is a FIN packet. removing from map")
                     self.__closed_connections_map.append((source_ip, global_connection_map_entry))
-                    print("adding FIN packet to closed connections list. size of list is: " +
-                          str(len(self.__closed_connections_map)))
+                    #print("adding FIN packet to closed connections list. size of list is: " +
+                    #     str(len(self.__closed_connections_map)))
                     self.__global_connections_map.pop(source_ip)
         return packet
 

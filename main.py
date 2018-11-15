@@ -3,8 +3,9 @@ from scapy.layers.inet import TCP, IP
 
 from exporter import CsvExporter
 from global_connections_manager import GlobalConnectionsManager
+from packets_trackers.enhanced_sub_connections_packets_tracker import EnhancedSubConnectionsPacketsTracker
 from packets_trackers.iptd_packets_tracker import IptdPacketsTracker
-from packets_trackers.ping_pong_packets_tacker import PingPongPacketsTracker
+from packets_trackers.ping_packets_tacker import PingPongPacketsTracker
 from packets_trackers.sub_connections_packets_tracker import SubConnectionsPacketsTracker
 from tcp_parser import TcpParser
 
@@ -40,27 +41,35 @@ from tcp_parser import TcpParser
 #
 # exporter = CsvExporter()
 # exporter.export_real_and_estimated_connections('results.csv', [1, 2, 3], [1, 1, 2], [1, 2, 1])
-# #
+#
+print("Starting Simulation")
 packet_sampling_times = []
 real_number_of_connections = []
 estimated_number_of_connections = []
 global_connections_manager = GlobalConnectionsManager()
-attacker = SubConnectionsPacketsTracker()
+attacker = IptdPacketsTracker()
 pcap_reader = PcapReader('captures/example2.pcap')
+exporter = CsvExporter('first_experiment.csv')
+exporter.clear_file()
+exporter.write_headers('times', 'real number of connections', 'estimated number of connections')
+counter = 0
 for raw_packet in pcap_reader:
     if raw_packet.haslayer(TCP) and raw_packet.haslayer(IP):  # TODO: maybe we need to also support IPv6
         tcp_packet = TcpParser().parse(raw_packet)
         quic_packet = global_connections_manager.get_quic_packet(tcp_packet)
+        counter += 1
+        if counter % 50000 == 0:
+            print("Processed: " + str(counter) + " packets")
+            exporter.write('a', packet_sampling_times, real_number_of_connections, estimated_number_of_connections)
+            packet_sampling_times.clear()
+            real_number_of_connections.clear()
+            estimated_number_of_connections.clear()
         if quic_packet is not None:
             attacker.track_packet(quic_packet, raw_packet.time)
             packet_sampling_times.append(raw_packet.time)
             real_number_of_connections.append(global_connections_manager.get_number_of_connections())
             estimated_number_of_connections.append(attacker.get_number_of_active_connections())
-
-exporter = CsvExporter().export('first_experiment.csv',
-                                packet_sampling_times,
-                                real_number_of_connections,
-                                estimated_number_of_connections)
+print("Finished Simulation")
 # packets = rdpcap('captures/example.pcap')
 # parser = TcpParser()
 # print("time: " + str(packets[0].time))
