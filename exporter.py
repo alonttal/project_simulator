@@ -25,4 +25,4 @@ class CsvExporter(Exporter):
         open(self.file_name, 'w').close()
 
     def write_headers(self, *headers):
-        self.export('a', *([h] for h in headers))
+        self.write('a', *([h] for h in headers))
