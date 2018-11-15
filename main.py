@@ -47,7 +47,7 @@ packet_sampling_times = []
 real_number_of_connections = []
 estimated_number_of_connections = []
 global_connections_manager = GlobalConnectionsManager()
-attacker = IptdPacketsTracker()
+attacker = EnhancedSubConnectionsPacketsTracker()
 pcap_reader = PcapReader('captures/example2.pcap')
 exporter = CsvExporter('first_experiment.csv')
 exporter.clear_file()
@@ -58,7 +58,7 @@ for raw_packet in pcap_reader:
         tcp_packet = TcpParser().parse(raw_packet)
         quic_packet = global_connections_manager.get_quic_packet(tcp_packet)
         counter += 1
-        if counter % 50000 == 0:
+        if counter % 1000 == 0:
             print("Processed: " + str(counter) + " packets")
             exporter.write('a', packet_sampling_times, real_number_of_connections, estimated_number_of_connections)
             packet_sampling_times.clear()

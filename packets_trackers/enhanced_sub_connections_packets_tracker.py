@@ -17,7 +17,8 @@ class ConnectionsMapEntry:
 
 class EnhancedSubConnectionsPacketsTracker(PacketsTracker):
     DEFAULT_EXPECTED_SUB_CONNECTION_TIME = 15
-    EXPECTED_DEAD_SUB_CONNECTION_FACTOR = 1
+    EXPECTED_DEAD_SUB_CONNECTION_FACTOR = 2
+    MINIMUM_NUMBER_OF_CLOSED_SAMPLES = 20
 
     def __init__(self):
         self.sum_of_sub_connection_time = 0
@@ -28,7 +29,7 @@ class EnhancedSubConnectionsPacketsTracker(PacketsTracker):
     def find_and_remove_dead_connections(self, current_time):
         # get the estimated sub-connection time. Note that we use a multiplication factor to refine the time.
         estimated_sub_connection_time = (EnhancedSubConnectionsPacketsTracker.DEFAULT_EXPECTED_SUB_CONNECTION_TIME
-                                         if len(self.__closed_sub_connections_map) == 0
+                                         if len(self.__closed_sub_connections_map) <= EnhancedSubConnectionsPacketsTracker.MINIMUM_NUMBER_OF_CLOSED_SAMPLES
                                          else self.sum_of_sub_connection_time / len(self.__closed_sub_connections_map))\
                                         * EnhancedSubConnectionsPacketsTracker.EXPECTED_DEAD_SUB_CONNECTION_FACTOR
         new_active_sub_connections_map = {}
@@ -58,18 +59,17 @@ class EnhancedSubConnectionsPacketsTracker(PacketsTracker):
             is_initial_packet = (quic_packet.reserved_bits == LongPacketType.INITIAL_PACKET)
             # if it is a packet with a new connection-id but it is not an Initial Packet, it means some old connection
             # has changed it's connection-id
-            if not is_initial_packet:
+            if not is_initial_packet and len(self.__active_sub_connections_list) > 0:
                 # we assume that the connection with the oldest arriving time has changed its connection-id
-                sub_connection_entry = self.__active_sub_connections_list.pop(0)
-                self.__active_sub_connections_map.pop(destination_connection_id)
+                sub_connection_record = self.__active_sub_connections_list.pop(0)
+                self.__active_sub_connections_map.pop(sub_connection_record[0])
                 # save the closing time of the sub connection
-                sub_connection_entry.closed_sub_connection_timestamp = packet_receive_time
-                self.__closed_sub_connections_map.update({destination_connection_id: sub_connection_entry})
-                self.sum_of_sub_connection_time += packet_receive_time - sub_connection_entry.first_packet_timestamp
-            else:  # initial packet - new connection was established
-                new_sub_connection_entry = ConnectionsMapEntry(packet_receive_time, packet_receive_time)
-                self.__active_sub_connections_map.update({destination_connection_id: new_sub_connection_entry})
-                self.__active_sub_connections_list.append((destination_connection_id, new_sub_connection_entry))
+                sub_connection_record[1].closed_sub_connection_timestamp = packet_receive_time
+                self.__closed_sub_connections_map.update({sub_connection_record[0]: sub_connection_record[1]})
+                self.sum_of_sub_connection_time += packet_receive_time - sub_connection_record[1].first_packet_timestamp
+            new_sub_connection_entry = ConnectionsMapEntry(packet_receive_time, packet_receive_time)
+            self.__active_sub_connections_map.update({destination_connection_id: new_sub_connection_entry})
+            self.__active_sub_connections_list.append((destination_connection_id, new_sub_connection_entry))
         self.find_and_remove_dead_connections(packet_receive_time)
 
     def get_number_of_active_connections(self):
