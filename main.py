@@ -5,6 +5,7 @@ from exporter import CsvExporter
 from global_connections_manager import GlobalConnectionsManager
 from packets_trackers.iptd_packets_tracker import IptdPacketsTracker
 from packets_trackers.ping_pong_packets_tacker import PingPongPacketsTracker
+from packets_trackers.sub_connections_packets_tracker import SubConnectionsPacketsTracker
 from tcp_parser import TcpParser
 
 # short_p = ShortPacket(123, 1, "encrypted payload")
@@ -44,7 +45,7 @@ packet_sampling_times = []
 real_number_of_connections = []
 estimated_number_of_connections = []
 global_connections_manager = GlobalConnectionsManager()
-attacker = IptdPacketsTracker()
+attacker = SubConnectionsPacketsTracker()
 pcap_reader = PcapReader('captures/example2.pcap')
 for raw_packet in pcap_reader:
     if raw_packet.haslayer(TCP) and raw_packet.haslayer(IP):  # TODO: maybe we need to also support IPv6
