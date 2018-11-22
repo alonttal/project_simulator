@@ -13,16 +13,14 @@ class CsvExporter(Exporter):
     def __init__(self, file_name):
         super().__init__(file_name)
 
-    def write(self,
-               mode,
-               *lists):
+    def write(self, mode, *lists):
         with open(self.file_name, mode, newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             for val in zip(*lists):
                 writer.writerow(val)
 
-    def clear_file(self):
-        open(self.file_name, 'w').close()
-
     def write_headers(self, *headers):
         self.write('a', *([h] for h in headers))
+
+    def clear_file(self):
+        open(self.file_name, 'w').close()

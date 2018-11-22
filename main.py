@@ -48,27 +48,28 @@ real_number_of_connections = []
 estimated_number_of_connections = []
 global_connections_manager = GlobalConnectionsManager()
 attacker = EnhancedSubConnectionsPacketsTracker()
-pcap_reader = PcapReader('captures/example2.pcap')
+pcap_reader = PcapReader('captures/example3.pcap')
 exporter = CsvExporter('first_experiment.csv')
-exporter.clear_file()
-exporter.write_headers('times', 'real number of connections', 'estimated number of connections')
 counter = 0
 for raw_packet in pcap_reader:
     if raw_packet.haslayer(TCP) and raw_packet.haslayer(IP):  # TODO: maybe we need to also support IPv6
+        counter += 1
         tcp_packet = TcpParser().parse(raw_packet)
         quic_packet = global_connections_manager.get_quic_packet(tcp_packet)
-        counter += 1
         if counter % 1000 == 0:
             print("Processed: " + str(counter) + " packets")
-            exporter.write('a', packet_sampling_times, real_number_of_connections, estimated_number_of_connections)
-            packet_sampling_times.clear()
-            real_number_of_connections.clear()
-            estimated_number_of_connections.clear()
+            # exporter.write('a', packet_sampling_times, real_number_of_connections, estimated_number_of_connections)
+            # packet_sampling_times.clear()
+            # real_number_of_connections.clear()
+            # estimated_number_of_connections.clear()
         if quic_packet is not None:
             attacker.track_packet(quic_packet, raw_packet.time)
             packet_sampling_times.append(raw_packet.time)
             real_number_of_connections.append(global_connections_manager.get_number_of_connections())
             estimated_number_of_connections.append(attacker.get_number_of_active_connections())
+exporter.clear_file()
+exporter.write_headers('times', 'real number of connections', 'estimated number of connections')
+exporter.write('a', packet_sampling_times, real_number_of_connections, estimated_number_of_connections)
 print("Finished Simulation")
 # packets = rdpcap('captures/example.pcap')
 # parser = TcpParser()
