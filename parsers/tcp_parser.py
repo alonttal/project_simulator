@@ -5,6 +5,7 @@ from headers.ip_header import IpHeader
 class TcpParser:
     FIN_MASK = 0x01
     SYN_MASK = 0x02
+    RST_MASK = 0x04
     ACK_MASK = 0x10
 
     def __build_ip_header(self, raw_ip_header):
@@ -24,8 +25,8 @@ class TcpParser:
         if raw_tcp_packet.flags & TcpParser.ACK_MASK:
             flags.append(TcpFlag.ACK)
             # print("ACK FLAG")
-        # if raw_tcp_packet.flags & 0x08:
-        #     print("RST FLAG")
+        if raw_tcp_packet.flags & TcpParser.RST_MASK:
+        	flags.append(TcpFlag.RST)
 
         return TcpPacket(
             ip_header,

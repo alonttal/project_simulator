@@ -23,6 +23,8 @@ class TcpConnectionsMapEntry:
         self.quic_version = quic_version
         self.start_timestamp = start_timestamp
         self.end_timestamp = start_timestamp
+        self.is_closed = False
+        self.is_handshake_completed = False
 
 
 class TcpConnectionsManager:
@@ -53,6 +55,7 @@ class TcpConnectionsManager:
         source_ip = tcp_packet.ip_header.source_ip
         destination_ip = tcp_packet.ip_header.destination_ip
         source_port = tcp_packet.source_port
+        destination_port = tcp_packet.destination_port
         key_tuple = (source_ip, destination_ip, source_port)
         connection_map_entry = self.connections_map.get(key_tuple)
         if connection_map_entry is None:  # not in map
@@ -76,7 +79,19 @@ class TcpConnectionsManager:
                                                                               quic_version,
                                                                               destination_connection_id,
                                                                               source_connection_id)
+            elif TcpFlag.RST in tcp_packet.flags:
+              key_tuple = (destination_ip, source_ip, destination_port)
+              connection_map_entry = self.connections_map.get(key_tuple)
+              if connection_map_entry is not None:  # client in map
+                  connection_map_entry.end_timestamp = packet_timestamp
+                  connection_map_entry.is_closed = True
         else:  # in map
+            if TcpFlag.SYN in tcp_packet.flags:
+              return None;
+            if TcpFlag.RST in tcp_packet.flags or TcpFlag.FIN in tcp_packet.flags:
+              connection_map_entry.is_closed = True
+            if TcpFlag.ACK in tcp_packet.flags:
+              connection_map_entry.is_handshake_completed = True
             if self.__should_generate_new_connection_id():
                 self.change_identification(connection_map_entry, tcp_packet)
             packet = TcpToQuicPacketConverter() \
